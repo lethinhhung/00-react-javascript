@@ -1,20 +1,39 @@
+import { AuthContext } from './components/context/auth.context';
 import Header from './components/layout/header';
 import axios from './util/axios.customize';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 
 function App() {
+    const { setAuth, appLoading, setAppLoading } = useContext(AuthContext);
     useEffect(() => {
-        const fetchHelloWorld = async () => {
-            const res = await axios.get(`/v1/api/`);
-            console.log(res);
+        const fetchAccount = async () => {
+            setAppLoading(true);
+            const res = await axios.get(`/v1/api/account`);
+            if (res) {
+                setAuth({
+                    isAuthenticated: true,
+                    user: {
+                        email: res.email,
+                        name: res.name,
+                    },
+                });
+            }
+
+            setAppLoading(false);
         };
 
-        fetchHelloWorld();
+        fetchAccount();
     }, []);
 
     return (
         <div>
-            <Header />
+            {appLoading === true ? (
+                <>Loading</>
+            ) : (
+                <>
+                    <Header />
+                </>
+            )}
         </div>
     );
 }
